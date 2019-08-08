@@ -167,6 +167,9 @@ public class DefaultArangoConverter implements ArangoConverter {
 		}
 
 		if (ClassTypeInformation.OBJECT.equals(typeToUse)) {
+			if (source.isArray()) {
+				return readCollection(typeToUse, source);
+			}
 			return readMap(ClassTypeInformation.MAP, source);
 		}
 
@@ -174,7 +177,7 @@ public class DefaultArangoConverter implements ArangoConverter {
 			return readArray(typeToUse, source);
 		}
 
-		if (typeToUse.isCollectionLike() || ClassTypeInformation.OBJECT.equals(typeToUse)) {
+		if (typeToUse.isCollectionLike()) {
 			return readCollection(typeToUse, source);
 		}
 
@@ -293,7 +296,7 @@ public class DefaultArangoConverter implements ArangoConverter {
 		}
 
 		final TypeInformation<?> componentType = getNonNullComponentType(type);
-		final Class<?> collectionType = Iterable.class.equals(type.getType()) ? Collection.class : type.getType();
+		final Class<?> collectionType = Iterable.class.equals(type.getType()) || ClassTypeInformation.OBJECT.equals(type) ? Collection.class : type.getType();
 		final Collection<Object> collection = CollectionFactory.createCollection(collectionType,
 			componentType.getType(), source.getLength());
 
